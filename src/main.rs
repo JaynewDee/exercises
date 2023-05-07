@@ -39,10 +39,10 @@ impl fmt::Display for Location {
         match self {
             Location::Unknown => write!(f, "Location unknown!"),
             Location::Anonymous => write!(f, "Anonymous Location ... "),
-            Location::Known(lat, lon) => write!(f, "Latitude: {}\nLongitude: {}", lat, lon)
+            Location::Known(lat, lon) => write!(f, "Latitude: {}\nLongitude: {}", lat, lon),
         }
     }
-} 
+}
 
 fn sum_array(nums_arr: Vec<i16>) -> i16 {
     nums_arr.iter().fold(0, |mut total, num| {
@@ -80,15 +80,72 @@ fn is_palindrome(input_str: &str) -> bool {
 fn main() {
     is_palindrome("racecar");
     make_satellite();
-    
+
     let location = Location::Unknown;
     println!("{}", location);
     let location = Location::Anonymous;
     println!("{}", location);
     let location = Location::Known(53.5556, 21.998);
     println!("{}", location);
+    func_traits::main();
 }
 
+pub mod func_traits {
+    use std::time::Instant;
+    // fn() ::: pointer
+    // vs
+    // Fn() ::: trait bound
+
+    // Fn
+    // - allows shared references
+    //
+    //
+    // FnMut
+    // - exclusive reference
+    //
+    //
+    // FnOnce
+    // - can only be called once
+    //
+    //
+    // const fn
+    //
+    //
+
+    //
+    fn higher_order(f: fn()) {
+        println!("{}", std::mem::size_of_val(&f));
+    }
+
+    fn with_func_reference<F: Fn()>(f: &F) {
+        f();
+    }
+
+    fn execution_timer(f: fn()) {
+        let start_time = Instant::now();
+        f();
+        let end_time = Instant::now();
+
+        println!("{:#?}", end_time - start_time);
+    }
+
+    fn cpu_spinner() {
+        let mil_range = (0..50_000_000).into_iter().collect::<Vec<u64>>();
+        mil_range.iter().fold(0, |mut acc, num| {
+            acc += num;
+            acc
+        });
+    }
+
+    pub fn main() {
+        // Closures can be coerced into function pointers/types
+        // if they do not capture any variables.
+        let closure = || ();
+        higher_order(closure);
+        //
+        execution_timer(cpu_spinner);
+    }
+}
 
 #[cfg(test)]
 mod tests {
